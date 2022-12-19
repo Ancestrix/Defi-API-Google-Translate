@@ -47,9 +47,10 @@ public class Main {
         return res;
     }
 
-    public static void translateText(String projectId, String targetLanguage, String text) throws IOException {
+    public static String translateText(String projectId, String targetLanguage, String text) throws IOException {
 
         // Initialize client that will be used to send requests. This client only needs to be created
+        String res = null;
         // once, and can be reused for multiple requests. After completing all of your requests, call
         // the "close" method on the client to safely clean up any remaining background resources.
         try (TranslationServiceClient client = TranslationServiceClient.create()) {
@@ -68,17 +69,19 @@ public class Main {
                             .build();
 
             TranslateTextResponse response = client.translateText(request);
-
             // Display the translation for each input text provided
             for (Translation translation : response.getTranslationsList()) {
-                System.out.printf("Translated text: %s\n", translation.getTranslatedText());
+                //System.out.printf("Translated text: %s\n", translation.getTranslatedText());
+                res = translation.getTranslatedText();
             }
         }
+        return res;
     }
     public static void main(String[] args) throws IOException {
         Scanner texte = new Scanner(System.in);
         System.out.println("Veuillez entrer votre texte à traduire :");
         String Text=texte.nextLine();
+        String InitText = detectLanguage("defit-371911",Text);
         List<String> langues = Arrays.asList("af", "am", "ar", "az", "be", "bg", "bn", "bs", "ca", "ceb", "co", "cs", "cy", "da", "de", "el", "en", "eo", "es",
                 "et", "eu", "fa", "fi", "fr", "fy", "ga", "gd", "gl", "gu", "ha", "haw", "hi", "hmn", "hr", "ht", "hu", "hy", "id", "ig", "is", "it", "iw",
                 "ja", "jw", "ka", "kk", "km", "kn", "ko", "ku", "ky", "la", "lb", "lo", "lt", "lv", "mg", "mi", "mk", "ml", "mn", "mr", "ms", "mt", "my", "ne",
@@ -89,9 +92,11 @@ public class Main {
         System.out.println("Le texte peut être traduit dans "+langues.size()+" langues différentes. Le texte va passer par "
                 +random_loop+" traductions ");
         for (int i=0;i<random_loop;i++){
-            translateText("defit-371911",langues.get(rand.nextInt(langues.size())),Text);
+            Text = translateText("defit-371911",langues.get(rand.nextInt(langues.size())),Text);
+            System.out.printf("Translated text: %s\n", Text);
             if (i==random_loop-1){
-                translateText("defit-371911",detectLanguage("defit-371911",Text),Text);
+                Text = translateText("defit-371911",InitText,Text);
+                System.out.printf("Translated text: %s\n", Text);
             }
         }
 
